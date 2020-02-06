@@ -1,0 +1,161 @@
+define("Classes/CompatScreen", ["require", "exports", "./../lib/jquery"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var ScreenDataTypeEnum;
+    (function (ScreenDataTypeEnum) {
+        ScreenDataTypeEnum[ScreenDataTypeEnum["FROM_FATHER"] = 0] = "FROM_FATHER";
+        ScreenDataTypeEnum[ScreenDataTypeEnum["FROM_SON"] = 1] = "FROM_SON";
+    })(ScreenDataTypeEnum = exports.ScreenDataTypeEnum || (exports.ScreenDataTypeEnum = {}));
+    class BaseCompatScreen {
+        constructor() {
+            this.fatherData = null;
+            this.sonData = null;
+            this.container = null;
+            this.navigation = null;
+            this.WHERE_CALL_FROM = ScreenDataTypeEnum.FROM_FATHER;
+            this.F = {};
+        }
+        setData(data) {
+            if (!data) {
+                return this;
+            }
+            if (data.TYPE == ScreenDataTypeEnum.FROM_FATHER) {
+                this.fatherData = data;
+            }
+            else if (data.TYPE == ScreenDataTypeEnum.FROM_SON) {
+                this.sonData = data;
+            }
+            return this;
+        }
+        ;
+        setContainer(container) {
+            this.container = container;
+            return this;
+        }
+        setNavigation(navigation) {
+            this.navigation = navigation;
+            return this;
+        }
+        draw() {
+            var _a;
+            (_a = this.container) === null || _a === void 0 ? void 0 : _a.load(this.HTML_VIEW_PATH, (html_element, respTxt, txtStatus, jqXHR) => {
+                this.F = this.findFields();
+                this.onViewLoad(html_element, respTxt, txtStatus, jqXHR);
+            });
+            return this;
+        }
+        // Called when screen goes background due to a new screen push
+        onBackground() {
+            return this;
+        }
+        // Called when screen goes foreground due to the pop of the front screen
+        // It tells if screen has been called from father or son
+        onForeground(where) {
+            console.log(where);
+            this.WHERE_CALL_FROM = where;
+            return this;
+        }
+        // Called when screen is poped
+        onClose() {
+            return this;
+        }
+        findFields() {
+            var _a;
+            let obj = {};
+            (_a = this.container) === null || _a === void 0 ? void 0 : _a.find("[id*=__]").each((_, a) => {
+                obj[a.id] = $(a);
+            });
+            return obj;
+        }
+    }
+    exports.BaseCompatScreen = BaseCompatScreen;
+    class Navigation {
+        constructor(container) {
+            this.screenStack = [];
+            this.container = container;
+        }
+        pushScreen(inScreen, data) {
+            let screenData;
+            if (this.screenStack.length > 0) {
+                let lastScreen = this.screenStack[this.screenStack.length - 1];
+                lastScreen.onBackground();
+            }
+            let nowScreen = inScreen.setContainer(this.container)
+                .setNavigation(this);
+            if (data !== undefined) {
+                screenData = {
+                    TYPE: ScreenDataTypeEnum.FROM_FATHER,
+                    data: data
+                };
+                nowScreen.setData(screenData);
+            }
+            this.screenStack.push(nowScreen.onForeground(ScreenDataTypeEnum.FROM_FATHER).draw());
+        }
+        popScreen(data) {
+            var _a;
+            let screenData;
+            (_a = this.screenStack.pop()) === null || _a === void 0 ? void 0 : _a.onClose();
+            let newScreen = this.screenStack[this.screenStack.length - 1];
+            if (data) {
+                screenData = {
+                    TYPE: ScreenDataTypeEnum.FROM_SON,
+                    data: data
+                };
+                newScreen.setData(screenData);
+            }
+            newScreen.onForeground(ScreenDataTypeEnum.FROM_SON).draw();
+        }
+    }
+    exports.Navigation = Navigation;
+});
+define("ViewControllers/Register", ["require", "exports", "Classes/CompatScreen"], function (require, exports, Compat) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    class RegisterController extends Compat.BaseCompatScreen {
+        constructor() {
+            super();
+            this.HTML_VIEW_PATH = "./Views/register.html";
+        }
+        onViewLoad(html_element, respTxt, txtStatus, jqXHR) {
+            this.setEvents();
+        }
+        setEvents() {
+            this.F["__back"].click(() => {
+                var _a;
+                console.log("asd");
+                (_a = this.navigation) === null || _a === void 0 ? void 0 : _a.popScreen();
+            });
+            this.F["__register"].click(() => {
+                alert("Hola, buenas tardes");
+            });
+            this.F["__idUser"].html(this.fatherData.data.idUser);
+        }
+    }
+    exports.RegisterController = RegisterController;
+});
+define("ViewControllers/Home", ["require", "exports", "Classes/CompatScreen", "ViewControllers/Register"], function (require, exports, Compat, Register_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    class HomeController extends Compat.BaseCompatScreen {
+        constructor() {
+            super();
+            this.HTML_VIEW_PATH = "./Views/home.html";
+        }
+        onViewLoad(html_element, respTxt, txtStatus, jqXHR) {
+            this.setEvents();
+        }
+        setEvents() {
+            this.F["__reg"].click(() => {
+                this.navigation.pushScreen(new Register_1.RegisterController(), { idUser: 123 });
+            });
+        }
+    }
+    exports.HomeController = HomeController;
+});
+define("App", ["require", "exports", "Classes/CompatScreen", "ViewControllers/Home"], function (require, exports, Compat, Home_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    // Start owo
+    let navigation = new Compat.Navigation($(".screen"));
+    navigation.pushScreen(new Home_1.HomeController());
+});
