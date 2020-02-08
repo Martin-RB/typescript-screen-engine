@@ -41,13 +41,18 @@ export abstract class BaseCompatScreen {
         return this;
     }
     draw(): BaseCompatScreen{
-        this.container?.load(this.HTML_VIEW_PATH, (html_element: any, respTxt: any, txtStatus: any, jqXHR: any) => {
-            this.F = this.findFields();
-            this.onViewLoad(html_element, respTxt, txtStatus, jqXHR);
+        this.container?.load(this.HTML_VIEW_PATH, (responseText: string, textStatus: JQuery.Ajax.TextStatus, jqXHR: JQuery.jqXHR<any>) => {
+            if(textStatus == "success"){
+                this.F = this.findFields();
+                this.onViewLoad();
+            }
+            else{
+                throw new Error("Imposible cargar html: " + this.HTML_VIEW_PATH);
+            }
         })
         return this;
     }
-    abstract onViewLoad(html_element: any, respTxt: any, txtStatus: any, jqXHR: any): void;
+    abstract onViewLoad(): void;
 
     // Called when screen goes background due to a new screen push
     onBackground(): BaseCompatScreen {

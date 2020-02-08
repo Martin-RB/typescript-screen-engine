@@ -38,9 +38,14 @@ define(["require", "exports", "lib/jquery"], function (require, exports) {
         }
         draw() {
             var _a;
-            (_a = this.container) === null || _a === void 0 ? void 0 : _a.load(this.HTML_VIEW_PATH, (html_element, respTxt, txtStatus, jqXHR) => {
-                this.F = this.findFields();
-                this.onViewLoad(html_element, respTxt, txtStatus, jqXHR);
+            (_a = this.container) === null || _a === void 0 ? void 0 : _a.load(this.HTML_VIEW_PATH, (responseText, textStatus, jqXHR) => {
+                if (textStatus == "success") {
+                    this.F = this.findFields();
+                    this.onViewLoad();
+                }
+                else {
+                    throw new Error("Imposible cargar html: " + this.HTML_VIEW_PATH);
+                }
             });
             return this;
         }
