@@ -65,8 +65,8 @@ export abstract class BaseCompatScreen {
         return this;
     }
     // Called when screen is poped
-    onClose(): BaseCompatScreen {
-        return this;
+    onClose(): boolean {
+        return true;
     }
 
     findFields() : JQueryArray{
@@ -91,11 +91,14 @@ export class Navigation  {
     container: JQuery;
     screenStack: Array<BaseCompatScreen> = [];
 
+    private lastScreen() {
+        return this.screenStack[this.screenStack.length - 1];
+    }
+
     pushScreen(inScreen: BaseCompatScreen, data?: MapArray): void {
         let screenData: IScreenData;
         if(this.screenStack.length > 0){
-            let lastScreen = this.screenStack[this.screenStack.length - 1];
-            lastScreen.onBackground();
+            this.lastScreen().onBackground();
         }
 
         let nowScreen = inScreen.setContainer(this.container)
@@ -113,8 +116,11 @@ export class Navigation  {
     popScreen(data?: MapArray) : void{
         let screenData: IScreenData;
 
-        this.screenStack.pop()?.onClose();
-        let newScreen = this.screenStack[this.screenStack.length - 1];
+        if(!this.lastScreen().onClose()){
+            return;
+        }
+        this.screenStack.pop();
+        let newScreen = this.lastScreen();
         
         if(data){
             screenData = {
@@ -125,6 +131,10 @@ export class Navigation  {
         }
         newScreen.onForeground(ScreenDataTypeEnum.FROM_SON).draw();
     }
+
+    
+
+    
 
     constructor(container:JQuery) {
         this.container = container;

@@ -35,6 +35,13 @@ export class RegisterController extends Compat.BaseCompatScreen{
         this.F["__idUser"].html(this.fatherData.data.idUser);
     }
 
+    onClose(){
+        if(this.F["__txt"].val() == ""){
+            return false;
+        }
+        return true;
+    }
+
     constructor() {
         super();
     }
