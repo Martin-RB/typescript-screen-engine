@@ -34,12 +34,26 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-define(["require", "exports", "./Navigation", "./BaseView"], function (require, exports, Navigation_1, BaseView_1) {
+define(["require", "exports", "./Navigation"], function (require, exports, Navigation_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var BasePresenter = /** @class */ (function () {
         function BasePresenter() {
         }
+        Object.defineProperty(BasePresenter.prototype, "fatherNavigation", {
+            get: function () {
+                return this._fatherNavigation;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(BasePresenter.prototype, "sonNavigation", {
+            get: function () {
+                return this._sonNavigation;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(BasePresenter.prototype, "ID", {
             get: function () {
                 return this._ID;
@@ -49,6 +63,9 @@ define(["require", "exports", "./Navigation", "./BaseView"], function (require, 
         });
         Object.defineProperty(BasePresenter.prototype, "container", {
             get: function () {
+                if (this._container == undefined) {
+                    throw new EvalError("Called container when _container was not set, call setContainer(container) first.");
+                }
                 return this._container;
             },
             enumerable: true,
@@ -62,45 +79,56 @@ define(["require", "exports", "./Navigation", "./BaseView"], function (require, 
                 this._sonData = data;
             }
         };
-        BasePresenter.prototype.setContainer = function (container) {
-            this._container = container;
+        BasePresenter.prototype.setContainer = function (__container) {
+            this._container = __container;
         };
         BasePresenter.prototype.setNavigation = function (navigation) {
             this._fatherNavigation = navigation;
         };
-        BasePresenter.prototype.onLoad = function () {
+        BasePresenter.prototype.init = function () {
+            var _this = this;
+            if (this._container != undefined) {
+                this._inner_view = new this._viewType(this._container);
+                this._inner_view.setOnBackEvent(function () {
+                    var _a;
+                    (_a = _this._fatherNavigation) === null || _a === void 0 ? void 0 : _a.tryPopScreen();
+                });
+            }
+            else {
+                throw new EvalError("Called init() when _container was not set. Call setContainer() first.");
+            }
+        };
+        BasePresenter.prototype.draw = function () {
             return __awaiter(this, void 0, void 0, function () {
                 var sonContainer;
-                var _this = this;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            if (!(this._view == undefined)) return [3 /*break*/, 4];
-                            this._view = new this._viewType(this._container);
-                            if (!(this._view instanceof BaseView_1.BaseView)) return [3 /*break*/, 2];
-                            this._view.setOnBackEvent(function () {
-                                var _a;
-                                (_a = _this._fatherNavigation) === null || _a === void 0 ? void 0 : _a.tryPopScreen();
-                            });
+                            if (!(this._inner_view !== undefined)) return [3 /*break*/, 2];
                             return [4 /*yield*/, this._view.draw()];
                         case 1:
                             _a.sent();
-                            if ("getNavigationContainer" in this._view) {
-                                sonContainer = this._view.getNavigationContainer();
+                            if ("getNavigationContainer" in this._inner_view) {
+                                sonContainer = this._inner_view.getNavigationContainer();
                                 this._sonNavigation = new Navigation_1.Navigation(sonContainer);
                             }
                             return [3 /*break*/, 3];
-                        case 2: throw new TypeError("_view is not instance of BaseView");
-                        case 3: return [3 /*break*/, 6];
-                        case 4: return [4 /*yield*/, this._view.draw()];
-                        case 5:
-                            _a.sent();
-                            _a.label = 6;
-                        case 6: return [2 /*return*/];
+                        case 2: throw new EvalError("Called draw() when _inner_view was not set. Call init() first.");
+                        case 3: return [2 /*return*/];
                     }
                 });
             });
         };
+        Object.defineProperty(BasePresenter.prototype, "_view", {
+            get: function () {
+                if (this._inner_view == undefined) {
+                    throw new EvalError("Requested view when _inner_view was not set. Call init() first.");
+                }
+                return this._inner_view;
+            },
+            enumerable: true,
+            configurable: true
+        });
         BasePresenter.prototype.onCreate = function () {
         };
         BasePresenter.prototype.onStart = function (origin) {

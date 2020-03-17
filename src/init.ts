@@ -1,4 +1,5 @@
-import { Navigation } from "./ScreenMastah/Navigation";
-import { P_Login } from "./Presenters/P_Login";
+import { Navigation } from "./ScreenMastah/NavigationCommon/Navigation";
+import { LoginPresenter } from "./NewTests/Login";
 
-new Navigation($("body")).pushScreen(P_Login);
+let masterNav = new Navigation($("#app"));
+masterNav.PushScreen(LoginPresenter);

@@ -56,7 +56,7 @@ define(["require", "exports", "./BasePresenter"], function (require, exports, Ba
                         case 0:
                             screen = new presenterType();
                             if (!this.isBasePresenter(screen)) {
-                                throw new TypeError("Screen pushed (" + presenterType.ID + ") is not BasePresenter type");
+                                throw new TypeError("Screen pushed (" + screen.ID + ") is not BasePresenter type");
                             }
                             (_a = this.getLastScreen()) === null || _a === void 0 ? void 0 : _a.onSuspend();
                             this._screenStack.push(screen);
@@ -65,7 +65,8 @@ define(["require", "exports", "./BasePresenter"], function (require, exports, Ba
                             if (data) {
                                 screen.setData(LoadOriginType.FROM_FATHER, data);
                             }
-                            return [4 /*yield*/, screen.onLoad()];
+                            screen.init();
+                            return [4 /*yield*/, screen.draw()];
                         case 1:
                             _b.sent();
                             screen.onCreate();
@@ -98,7 +99,7 @@ define(["require", "exports", "./BasePresenter"], function (require, exports, Ba
                             if (data) {
                                 screen.setData(LoadOriginType.FROM_SON, data);
                             }
-                            screen.onLoad();
+                            screen.draw();
                             screen.onStart(LoadOriginType.FROM_SON);
                             return [2 /*return*/, true];
                     }
