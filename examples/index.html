@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+
+    </div>
+
+    <!--
+        TUTO:::
+        Se requiere tener instalado requireJS y JQuery para que el sistema funcione
+    -->
+    <script src="./../lib/require.js"></script>
+    <script src="./../lib/jquer_y.js"></script>
+    <script>
+        requirejs.config({
+            paths: {
+                // TUTO:::
+                // Apuntar al directorio de compilacion. En este caso esta en ../bin
+                // "Home" (../bin) sera el directorio base de los .js
+                home: "../bin"
+            }
+        });
+        /* 
+            Y requireJS requiere referenciarse a los .js. 
+            Asi que le ponemos el prefijo "home/"
+        */
+        require(["home/" + "examples/src/init"]);
+    </script>
+</body>
+</html>

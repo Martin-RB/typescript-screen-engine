@@ -1,4 +1,4 @@
-import { IHashMap } from "../Navigation";
+import { IHashMap } from "../Common/IHashMap";
 
 export abstract class BaseView{
     public abstract pathScreen: string;

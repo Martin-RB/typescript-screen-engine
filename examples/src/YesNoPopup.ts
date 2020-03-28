@@ -1,22 +1,37 @@
-import { BasePopup } from "../ScreenMastah/PopupCommon/BasePopup";
-import { BaseView } from "../ScreenMastah/ScreenDynamicCommon/BaseView";
-import { PopupCloseInfo } from "../ScreenMastah/PopupCommon/PopupCloseInfo";
+import { BasePopup } from "../../lib/ScreenMastah/PopupCommon/BasePopup";
+import { BaseView } from "../../lib/ScreenMastah/ScreenDynamicCommon/BaseView";
+import { PopupCloseInfo } from "../../lib/ScreenMastah/PopupCommon/PopupCloseInfo";
 
 export class YesNoPopup extends BasePopup<YesNoPopupView>{
     protected viewType: new (container: JQuery<HTMLElement>) => YesNoPopupView = YesNoPopupView;
     
+    /*
+        TUTO:::
+        Es importante que se pongan los CloseState (_CS)
+        Esto principalmente para poder identificar con facilidad y sin ambiguedad
+            el motivo por el cual un popup se ha cerrado.
+            Ejemplo: Si se ha cerrado por hacer click en si (YES_CS), o click en no (NO_CS)
+                o, en un supuesto, el usuario lo cerro (USER_CLOSE_CS)
+    */
     static YES_CS = "0";
     static NO_CS = "1";
     
+    /**
+     * TUTO:::
+     * Open se llama cuando se abre el popup. Como es async, detendra la ejecucion hasta que 
+     * se resuelva (res()) la promesa
+     */
     async Open(): Promise<PopupCloseInfo> {
 
         let title = this.ppData["title"];
         let text = this.ppData["text"];
-        console.log(title, text);
         
         this.View.setTexts(title, text);
 
         return new Promise((res, rej) => {
+
+            // Aqui se declaran los eventos que marcaran el cierre del popup
+
             this.View.OnYesClickEvent = () => {
                 res(new PopupCloseInfo(YesNoPopup.YES_CS));
             }
@@ -29,6 +44,10 @@ export class YesNoPopup extends BasePopup<YesNoPopupView>{
 
 }
 
+/**
+ * TUTO:::
+ * La vista del popup funciona de la misma manera que las vistas de los presentadores
+ */
 export class YesNoPopupView extends BaseView{
     public pathScreen: string = "html/popup/yesNo.html";
 

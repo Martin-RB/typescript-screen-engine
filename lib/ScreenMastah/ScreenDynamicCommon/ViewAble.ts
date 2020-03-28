@@ -1,4 +1,4 @@
-import { BaseView } from "../ScreenDynamicCommon/BaseView";
+import { BaseView } from "./BaseView";
 
 export abstract class ViewAble<TView extends BaseView> {
     

@@ -1,6 +1,6 @@
-import { BasePresenter } from "../ScreenMastah/PresenterCommon/BasePresenter";
-import { BaseView } from "../ScreenMastah/ScreenDynamicCommon/BaseView";
-import { Navigation } from "../ScreenMastah/NavigationCommon/Navigation";
+import { BasePresenter } from "../../lib/ScreenMastah/PresenterCommon/BasePresenter";
+import { BaseView } from "../../lib/ScreenMastah/ScreenDynamicCommon/BaseView";
+import { Navigation } from "../../lib/ScreenMastah/NavigationCommon/Navigation";
 import { LoginPresenter } from "./Login";
 
 export class PlatformPresenter extends BasePresenter<PlatformView>{
@@ -9,7 +9,17 @@ export class PlatformPresenter extends BasePresenter<PlatformView>{
     innerNavigation: Navigation | undefined;
 
     OnCreate(){
+        /*
+            TUTO:::
+            Ejemplo de como un Presentador puede tener una navegacion interna.
+            Aqui, el presentador le pide a la vista que le de el contenedor donde 
+            la navegacion sera implementada
+        */
         this.innerNavigation = new Navigation(this.View.GetInnerNavigationContainer());
+        /**
+         * La estructura de MVP y el ScreenMastah permiten que las pantallas puedan ser llamadas 
+         * En situaciones recursivas sin interferir una con la otra
+         */
         this.innerNavigation.PushScreen(LoginPresenter);
 
         this.View.OnLogoutClicked = () => {
